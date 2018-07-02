@@ -49,7 +49,7 @@ module.exports = (env) ->
       @_temperature = lastState?.temperature?.value
       @_humidity = lastState?.humidity?.value
 
-      BME280 = require 'node-bme280'
+      BME280 = require 'i2c-bme280'
       @sensor = new BME280({
         address: parseInt @config.address
       });
