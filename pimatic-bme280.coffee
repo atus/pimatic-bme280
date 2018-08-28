@@ -15,6 +15,7 @@ module.exports = (env) ->
           return device
       })
 
+  plugin = new BME280Plugin
 
   class PressureSensor extends env.devices.Sensor
     attributes:
@@ -36,18 +37,18 @@ module.exports = (env) ->
 
     template: "temperature"   
 
-
   class BME280Sensor extends PressureSensor
-    _pressure: null
-    _temperature: null
-    _humidity: null
+    _data: null
 
     constructor: (@config, lastState) ->
       @id = @config.id
       @name = @config.name
-      @_pressure = lastState?.pressure?.value
-      @_temperature = lastState?.temperature?.value
-      @_humidity = lastState?.humidity?.value
+      
+      @_data = {
+        pressure: lastState?.pressure?.value,
+        temperature: lastState?.temperature?.value,
+        humidity: lastState?.humidity?.value
+      }
 
       BME280 = require 'i2c-bme280'
       @sensor = new BME280({
@@ -58,29 +59,36 @@ module.exports = (env) ->
 
       super()
 
-      @requestValue()
-      @requestValueIntervalId = setInterval( ( => @requestValue() ), @config.interval)
+      calibrateAndEmitValue = (attributeName, calibrationExpression, value) =>
+        variableManager = plugin.framework.variableManager
+        info = variableManager.parseVariableExpression(calibrationExpression.replace(/\$value\b/g, value))
+        calibratedValue = variableManager.evaluateNumericExpression(info.tokens)
+        Promise.resolve(calibratedValue).then((result) =>
+          @_data[attributeName] = result
+          @emit attributeName, result
+        )
+
+      requestValue = () =>
+        try
+          @sensor.begin((err) =>
+            @sensor.readPressureAndTemparature((err, pressure, temperature, humidity) =>
+              calibrateAndEmitValue('pressure', @config.pressureCalibration, pressure/100)
+              calibrateAndEmitValue('temperature', @config.temperatureCalibration, temperature)
+              calibrateAndEmitValue('humidity', @config.humidityCalibration, humidity)
+            )
+          )
+        catch err
+          env.logger.error("Error processing sensor data: #{error}")
+
+      requestValue()
+      @requestValueIntervalId = setInterval( ( => requestValue() ), @config.interval)
     
+    getPressure: -> Promise.resolve(@_data['pressure'])
+    getTemperature: -> Promise.resolve(@_data['temperature'])
+    getHumidity: -> Promise.resolve(@_data['humidity'])
+
     destroy: () ->
       clearInterval @requestValueIntervalId if @requestValueIntervalId?
       super()
-
-    requestValue: ->
-      @sensor.begin((err) =>
-        @sensor.readPressureAndTemparature( (err, pressure, temperature, humidity) =>
-          @_pressure = pressure/100
-          @emit 'pressure', pressure/100
-      
-          @_temperature = temperature
-          @emit 'temperature', temperature
-
-          @_humidity = humidity
-          @emit 'humidity', humidity
-        )
-    )
-    getPressure: -> Promise.resolve(@_pressure)
-    getTemperature: -> Promise.resolve(@_temperature)
-    getHumidity: -> Promise.resolve(@_humidity)
-
-  myPlugin = new BME280Plugin
-  return myPlugin
+    
+  return plugin
