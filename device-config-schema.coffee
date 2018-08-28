@@ -19,15 +19,15 @@ module.exports = {
         type: "integer"
         default: "10000"
       pressureCalibration:
-        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself."
+        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself"
         type: "string"
         default: "$value"
       temperatureCalibration:
-        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself."
+        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself"
         type: "string"
         default: "$value"
       humidityCalibration:
-        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself."
+        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself"
         type: "string"
         default: "$value"
     }
