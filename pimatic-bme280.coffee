@@ -70,8 +70,16 @@ module.exports = (env) ->
 
       requestValue = () =>
         try
-          @sensor.begin((err) =>
+          @sensor.begin((error) =>
+            if error? 
+              env.logger.error("Error when initializing bme280 sensor on address #{@config.address}: #{error.message}")
+              env.logger.debug error
+              return
             @sensor.readPressureAndTemparature((err, pressure, temperature, humidity) =>
+              if error? 
+                env.logger.error("Error when reading bme280 sensor data on address #{@config.address}: #{error.message}")
+                env.logger.debug error
+                return
               calibrateAndEmitValue('pressure', @config.pressureCalibration, pressure/100)
               calibrateAndEmitValue('temperature', @config.temperatureCalibration, temperature)
               calibrateAndEmitValue('humidity', @config.humidityCalibration, humidity)

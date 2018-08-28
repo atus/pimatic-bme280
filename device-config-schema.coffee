@@ -4,7 +4,7 @@ module.exports = {
   BME280Sensor: {
     title: "BME280Sensor config options"
     type: "object"
-    extensions: ["xLink","xAttributeOptions"]
+    extensions: ["xLink", "xAttributeOptions"]
     properties: {
       device:
         description: "Device file to use; default /dev/i2c-1"
