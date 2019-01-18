@@ -4,7 +4,7 @@ module.exports = {
   BME280Sensor: {
     title: "BME280Sensor config options"
     type: "object"
-    extensions: ["xLink","xAttributeOptions"]
+    extensions: ["xLink", "xAttributeOptions"]
     properties: {
       device:
         description: "Device file to use; default /dev/i2c-1"
@@ -18,6 +18,18 @@ module.exports = {
         description: "Interval in ms"
         type: "integer"
         default: "10000"
+      pressureCalibration:
+        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself"
+        type: "string"
+        default: "$value"
+      temperatureCalibration:
+        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself"
+        type: "string"
+        default: "$value"
+      humidityCalibration:
+        description: "Expression for calibrating the sensor value; $value is a placeholder for the value itself"
+        type: "string"
+        default: "$value"
     }
   }
 }

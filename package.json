@@ -1,6 +1,6 @@
 {
   "name": "pimatic-bme280",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Pimatic plugin for the bme280 barometric pressure sensor",
   "main": "pimatic-bme280",
   "files": [
@@ -24,7 +24,8 @@
     "iot"
   ],
   "author": {
-    "name": "Alan Tus"
+    "name": "Alan Tus",
+    "url": "https://github.com/atus"
   },
   "contributors": [
     {
